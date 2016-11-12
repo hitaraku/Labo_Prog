@@ -1,11 +1,12 @@
 #include <iostream>
-#include "TokenStream.hpp"
+#include "Parser.hpp"
 using namespace std;
 
 extern TokenStream *LexicalAnalysis(std::string input_filename);
 
 int main(int argc, char** argv)
 {
-  if(argc > 1)
-    LexicalAnalysis(argv[1]);
+  if(argc > 1) {
+    Parser *p = new Parser(argv[1]);
+  }
 }

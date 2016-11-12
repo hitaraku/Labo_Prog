@@ -1,31 +1,38 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
+#include <map>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+
 #include "TokenStream.hpp"
+#include "AST.hpp"
+#include "APP.hpp"
 
 class Parser {
 private:
-  TokenStream *mp_Tokens;
-  TranslationUnitAST *mp_TU;
+  TokenStream *m_Tokens;
+  TranslationUnitAST *m_TU;
 
   // table of identifie of analysys
-  std::vector<std::string> mv_VariableTable;
-  std::map<std::string, int> mm_PrototypeTable;
-  std::map<std::string, int> mm_FunctionTable;
-
-  // parse target filename
-  std::string m_filename;
+  std::vector<std::string> m_VariableTable;
+  std::map<std::string, int> m_PrototypeTable;
+  std::map<std::string, int> m_FunctionTable;
 
 public:
-  ~Parser(){ SAFE_DELETE(mp_TU); SAFE_DELETE(mp_Tokens); }
   Parser(std::string filename);
+  ~Parser(){ SAFE_DELETE(m_TU); SAFE_DELETE(m_Tokens); }
   bool doParse();
   TranslationUnitAST &getAST();
 
 private:
 
-  // LexicalAnalysys
-  TokenStream LexicalAnalysys();
+  // LexicalAnalysis
+  TokenStream *LexicalAnalysis(std::string filename);
   
   /////////////////////////////
   // literal analysys method //
@@ -35,8 +42,8 @@ private:
   PrototypeAST *visitFunctionDeclaration();
   FunctionAST *visitFunctionDefinition();
   PrototypeAST *visitPrototype();
-  FunctionStmtAST *visitFunctionStatement(PrototypeAST *proto);
-  VariableDeclAST *visitVariableDeclaration();
+  FunctionStatementAST *visitFunctionStatement(PrototypeAST *proto);
+  VariableDeclarationAST *visitVariableDeclaration();
   BaseAST *visitStatement();
   BaseAST *visitExpressionStatement();
   BaseAST *visitJumpStatement();
