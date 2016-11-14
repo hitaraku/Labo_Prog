@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum TOKEN_TYPE{
+enum TOKEN_TYPE {
   TOK_INT,
   TOK_EOF,
   TOK_IDENTIFIER,
