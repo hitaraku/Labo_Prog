@@ -1,6 +1,43 @@
 #include "Parser.hpp"
 
-void Parser::LaxycalAnalysys(std::string filename)
+Parser::Parser(std::string filename) { LexicalAnalysys(filename); }
+
+bool Parser::doParse()
+{
+  if(!Tokens) {
+    fprintf(stderr, "error at lexer\n");
+    return false;
+  } else {
+    return visitTranslationUnit();
+  }
+}
+
+TranslationUnitAST &Parser::getAST()
+{
+  if(m_TU) {
+    return *m_TU;
+  } else {
+    return (new TranslationUnitAST());
+  }
+}
+
+bool Parser::visitTranslationUnit()
+{
+  m_TU = new TranslationUnitAST();
+
+  while(true) {
+    if(!visitExternalDeclaration(m_TU)) {
+      SAFE_DELETE(m_TU);
+      return false;
+    }
+    if(TokenStream::Instance()->getCurType() == TOK_EOF) {
+      break;
+    }
+    return true;
+  }
+}
+
+void Parser::LexycalAnalysys(std::string filename)
 {
   fstream fs(filename, ios::in);
   string str;

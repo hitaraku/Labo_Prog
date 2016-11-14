@@ -29,6 +29,11 @@ public:
   int getTokenSize() { return m_tokens.size(); }
   void setToken(Token* token) { m_tokens.push_back(token); ++m_index; }
 
+  // return current status
+  std::string getCurStr() { return m_tokens[m_index]->getString(); }
+  TOKEN_TYPE getCurType() { return m_tokens[m_index]->getType(); }
+  int getCurNum() { return m_tokens[m_index]->getNum(); }
+
 private:
   std::vector<Token*> m_tokens;
   static TokenStream *m_tokenStream;
