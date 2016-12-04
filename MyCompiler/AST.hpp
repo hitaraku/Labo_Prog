@@ -1,20 +1,45 @@
 #ifndef __AST_H
 #define __AST_H
 
+#include<string>
+#include<map>
+#include<vector>
+#include<llvm/Support/Casting.h>
+#include"APP.hpp"
+
+class BaseAST;
+class VariableAST;
+class NumberAST;
+class JumpStmtAST;
+class NullExprAST;
+class BinaryExprAST;
+class CallExprAST;
+class VariableDeclAST;
+class FunctionStmtAST;
+class PrototypeAST;
+class FunctionAST;
+class TranslationUnitAST;
+
 enum AST_ID {
   BaseID,
   VariableID,
   NumberID,
+  JumpStmtID,
+  NullExprID,
   BinaryExprID,
+  CallExprID,
   VariableDeclID,
-  JumpStmtID
+  FunctionStmtID,
+  PrototypeID,
+  FunctionID,
+  TranslationUnitID
 };
 
 class BaseAST
 {
 public:
   BaseAST(AST_ID id) : m_ID(id) {}
-  virtual ~BaseAST() = 0;
+  virtual ~BaseAST() {}
   AST_ID getValueID() const { return m_ID; }
 
 private:
@@ -51,7 +76,7 @@ public:
   static inline bool classof(VariableAST const *) { return true; }
   static inline bool classof(BaseAST const *base) { return base->getValueID() == VariableID; }
 
-  int getNum() { return m_num; }
+  int getNumberValue() { return m_num; }
 
 private:
   int m_num;
@@ -75,6 +100,15 @@ private:
   BaseAST* m_expr;
 };
 
+class NullExprAST : public BaseAST{
+	public:
+		NullExprAST() : BaseAST(NullExprID){}
+		static inline bool classof(NullExprAST const*){return true;}
+		static inline bool classof(BaseAST const* base){
+		return base->getValueID()==NullExprID;
+	}
+};
+
 class BinaryExprAST : public BaseAST
 {
 public:
@@ -92,8 +126,8 @@ public:
   static inline bool classof(BinaryExprAST const *) { return true; }
   static inline bool classof(BaseAST const *base) { return base->getValueID() == BinaryExprID; }
 
-  std::string getOpr() { return m_opr; }
-  BaseAST *getLHS() { return m_lHS; }
+  std::string getOp() { return m_opr; }
+  BaseAST *getLHS() { return m_lhs; }
   BaseAST *getRHS() { return m_rhs; }
 
 private:
@@ -110,7 +144,7 @@ public:
     m_callee(callee),
     m_args(args)
   {}
-  virtual ~CallExprAST() {}
+  virtual ~CallExprAST();
 
   static inline bool classof(VariableDeclAST const *) { return true; }
   static inline bool classof(BaseAST const *base) { return base->getValueID() == VariableDeclID; }
@@ -164,11 +198,11 @@ private:
 class FunctionStmtAST : public BaseAST
 {
 public:
-  FunctionStmtAST() : {}
-  virtual ~FunctionStmtAST() {}
+  FunctionStmtAST() : BaseAST(FunctionStmtID) {}
+  virtual ~FunctionStmtAST();
 
   bool addVariableDeclaration(VariableDeclAST *vdecl);
-  bool addStatement(BaseAST *stmt) { StmtLists.push_back(stmt); }
+  bool addStatement(BaseAST *stmt) { m_stmtLists.push_back(stmt); }
 
   VariableDeclAST *getVariableDecl(int i) {
     if(i < m_variableDecls.size()) {
@@ -204,6 +238,7 @@ public:
   static inline bool classof(BaseAST const *base) { return base->getValueID() == VariableDeclID; }
 
   std::string getName() { return m_name; }
+	std::string getParamName(int i){if(i<m_params.size())return m_params.at(i);return NULL;}
   std::string getParam(int i) {
     if(i < m_params.size()) {
       return m_params[i];
@@ -225,7 +260,7 @@ public:
     m_proto(proto),
     m_body(body)
   {}
-  virtual ~FunctionAST() {}
+  virtual ~FunctionAST();
 
   std::string getName() { return m_proto->getName(); }
   PrototypeAST *getPrototype() { return m_proto; }
@@ -240,13 +275,14 @@ class TranslationUnitAST
 {
 public:
   TranslationUnitAST() { }
-  virtual ~TranslationUnitAST() { }
+  virtual ~TranslationUnitAST();
 
   bool addPrototype(PrototypeAST *proto);
   bool addFunction(FunctionAST *func);
+  bool empty();
 
   PrototypeAST *getPrototype(int i) {
-    if(i < m_prototypes.size) {
+    if(i < m_prototypes.size()) {
       return m_prototypes.at(i);
     } else {
       return NULL;

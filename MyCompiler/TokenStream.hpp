@@ -2,41 +2,38 @@
 #define __TOKENSTREAM_HPP
 
 #include <vector>
+#include <iostream>
 
 #include "Token.hpp"
 
 class TokenStream
 {
-private:
+public:
   TokenStream() : m_index(0) {}
   ~TokenStream() {
+    std::cout << "called tokenstream destructor" << std::endl;
     m_tokens.clear();
-    delete m_tokenStream;
   }
 
+private:  
   bool checkTokenIndex(int i);
 
 public:
-  static TokenStream* Instance() {
-    if(m_tokenStream == NULL) {
-      m_tokenStream = new TokenStream;
-    } else {
-      return m_tokenStream;
-    }
-  }
-
   Token* getToken(int i);
   int getTokenSize() { return m_tokens.size(); }
-  void setToken(Token* token) { m_tokens.push_back(token); ++m_index; }
+  void setToken(Token* token);
 
   // return current status
-  std::string getCurStr() { return m_tokens[m_index]->getString(); }
-  TOKEN_TYPE getCurType() { return m_tokens[m_index]->getType(); }
-  int getCurNum() { return m_tokens[m_index]->getNum(); }
+  std::string getCurString() ;
+  TOKEN_TYPE getCurType() ;
+  int getCurNum() ;
+  void getNextToken() ;
+  void unsetToken(int i) ;
+  int getCurIndex() ;
+  void applyTokenIndex(int i) ;
 
 private:
   std::vector<Token*> m_tokens;
-  static TokenStream *m_tokenStream;
   int m_index;
 };
 

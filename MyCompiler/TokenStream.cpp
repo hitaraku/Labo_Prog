@@ -20,3 +20,11 @@ Token* TokenStream::getToken(int i) {
   }
 }
 
+void TokenStream::setToken(Token* token){ m_tokens.push_back(token); ++m_index; }
+std::string TokenStream::getCurString() { return m_tokens[m_index-1]->getString(); }
+TOKEN_TYPE TokenStream::getCurType() { return m_tokens[m_index-1]->getType(); }
+int TokenStream::getCurNum() { return m_tokens[m_index-1]->getNum(); }
+void TokenStream::getNextToken() { ++m_index; }
+void TokenStream::unsetToken(int i) { m_index -= i; }
+int TokenStream::getCurIndex() { return m_index; }
+void TokenStream::applyTokenIndex(int i) { m_index = i; }

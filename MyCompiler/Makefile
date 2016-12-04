@@ -1,14 +1,15 @@
 CXX = g++
-CLANG = clang
-CFLAGS = -g -std=c++0x
-OBJECTS = main.o TokenStream.o
-LLVMFLG = `llvm-config --cxxflags`
+CLANG = clang++
+CFLAGS = -g --std=c++0x
+OBJECTS = main.o TokenStream.o CodeGen.o Parser.o AST.o
+LLVMFLG = llvm-config
+CONFIG = --cxxflags --ldflags --libs
 
 main: $(OBJECTS)
-	$(CXX) $(LLVMFLG) $(OBJECTS) -o $@
+	$(CLANG) -g $(OBJECTS) `$(LLVMFLG) $(CONFIG)` -ldl -o $@
 
 %.o: %.cpp
-	$(CXX) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CFLAGS) `$(LLVMFLG) $(CONFIG)` -c $< -o $@
 
 clean:
 	rm -rf *.o
